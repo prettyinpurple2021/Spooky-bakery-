@@ -1,0 +1,6 @@
+{
+  "name": "Spooky Sweet Bakery Assistant",
+  "description": "A fullstack spooky baking assistant with local recipe grimoire persistence, custom egg substitution chemistry, culinary cauldrons, baking timers, and a server-side Gemini recipe alchemist.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

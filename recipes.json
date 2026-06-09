@@ -1,0 +1,119 @@
+[
+  {
+    "title": "Golden Toaster Oven Yellow Cake",
+    "prep": "15 mins",
+    "cook": "25 mins @ 325°F",
+    "yield": "1 cute round cake",
+    "category": "Cake",
+    "favorite": true,
+    "ingredients": [
+      "2.5 cups All-Purpose Flour",
+      "1.5 cups Sugar",
+      "2.5 tsp Baking Powder",
+      "0.5 tsp Salt",
+      "1 cup Whole Milk (slightly warm)",
+      "3 whole Eggs (room temperature)",
+      "2 tsp Vanilla Flavor",
+      "1 stick Unsalted Butter (melted and cooled slightly)"
+    ],
+    "directions": [
+      "Preheat your toaster oven using Convection Bake setting to 325°F.",
+      "Rest your flexible silicone cake pan directly onto the solid metal baking sheet.",
+      "In a large cauldron bowl, whisk together the flour, sugar, baking powder, and salt.",
+      "In a second bowl, beat your eggs (or activate egg-free substitute spell!), milk, vanilla, and melted butter.",
+      "Pour liquids into dry and fold slowly with a spatula until flour disappears. Do not overmix!",
+      "Pour the batter into the silicone pan, leveling the top.",
+      "Bake for 25 minutes on the middle rack until a toothpick plunged in the center emerges dry.",
+      "Let cool completely on the counter for at least 30 minutes."
+    ]
+  },
+  {
+    "title": "Creamy Buttercream Spooky Frosting",
+    "prep": "10 mins",
+    "cook": "None (Raw)",
+    "yield": "1 cake coverage",
+    "category": "Cake",
+    "favorite": true,
+    "ingredients": [
+      "1 stick Unsalted Butter (fully softened to room temperature)",
+      "3 cups Powdered Sugar",
+      "3 tbsp Heavy Whipping Cream (or Half & Half)",
+      "1 tsp Vanilla Flavor"
+    ],
+    "directions": [
+      "In a clean mixing bowl, beat the softened butter with a sturdy spoon or hand mixer for 1 full minute until smooth.",
+      "Slowly stir in about half of the powdered sugar until combined.",
+      "Pour in the vanilla flavor and 2 tablespoons of the heavy whipping cream. Stir until smooth.",
+      "Slowly add the remaining powdered sugar and whip well.",
+      "Check texture: if too dry, add a tiny splash more cream; if too soft, add another spoonful of powdered sugar.",
+      "Spread evenly onto your yellow cake."
+    ]
+  },
+  {
+    "title": "Toxic Mint Whipped Dream",
+    "prep": "5 mins",
+    "cook": "Ice Cold",
+    "yield": "2 cups",
+    "category": "Dessert",
+    "favorite": false,
+    "ingredients": [
+      "1 cup Heavy Whipping Cream (chilled)",
+      "2 tbsp Powdered Sugar",
+      "1 tsp Vanilla Flavor"
+    ],
+    "directions": [
+      "Chill your bowl and whisk in the freezer for 10 minutes prior to whisking.",
+      "Pour the cold heavy whipping cream into the chilled bowl.",
+      "Whip vigorously until the cream starts holding shape.",
+      "Add the powdered sugar and vanilla flavor.",
+      "Whip just until stiff peaks form. Refrigerate until ready to use."
+    ]
+  },
+  {
+    "title": "Alchemist Custard Pudding",
+    "prep": "5 mins",
+    "cook": "10 mins",
+    "yield": "4 small cups",
+    "category": "Dessert",
+    "favorite": false,
+    "ingredients": [
+      "2 cups Whole Milk",
+      "0.5 cup Sugar",
+      "2 whole Eggs",
+      "2 tbsp Flour",
+      "1 tsp Vanilla Flavor"
+    ],
+    "directions": [
+      "Gently heat the whole milk in a saucepan until hot, but not boiling.",
+      "In a separate bowl, whisk together the sugar, flour, and eggs (or choose egg-free substitute).",
+      "Temper the eggs by pouring a very small splash of hot milk into the egg bowl while whisking rapidly.",
+      "Pour everything back into the hot pot.",
+      "Heat over medium-low, whisking constantly until the mixture bubbles and thickens.",
+      "Remove from heat, whisk in the vanilla, and cool before serving."
+    ]
+  },
+  {
+    "title": "Witching Hours Fluffy Pancakes",
+    "prep": "10 mins",
+    "cook": "10 mins",
+    "yield": "8 fluffy pancakes",
+    "category": "Breakfast",
+    "favorite": false,
+    "ingredients": [
+      "1.5 cups All-Purpose Flour",
+      "3.5 tsp Baking Powder",
+      "1 tbsp Sugar",
+      "1 tsp Salt",
+      "1.25 cups Whole Milk",
+      "1 whole Egg",
+      "3 tbsp Unsalted Butter (melted)"
+    ],
+    "directions": [
+      "Whisk the dry flour, baking powder, sugar, and salt together in a bowl.",
+      "Pour in the milk, egg (or egg replacement), and melted butter.",
+      "Mix gently. Let the batter rest for 5 minutes (this activates the baking powder).",
+      "Ladle portions onto a greased pan over medium-high heat.",
+      "Flip once bubble indicators burst on top, cooking until both sides are golden."
+    ]
+  }
+]
