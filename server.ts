@@ -201,6 +201,59 @@ You MUST return a JSON object conforming exactly to this schema:
   }
 });
 
+// POST: Conversational Chatbot
+app.post("/api/gemini/chat", async (req, res) => {
+  const { history, message } = req.body;
+  if (!message) {
+    return res.status(400).json({ error: "Message is required." });
+  }
+
+  try {
+    const ai = getGeminiClient();
+    const currentRecipes = readRecipes();
+    
+    // Create a compact version of recipes for context to save tokens
+    const compactRecipes = currentRecipes.map((r, i) => ({
+      id: i,
+      title: r.title,
+      category: r.category,
+      ingredients: r.ingredients,
+    }));
+
+    const systemPrompt = `You are a helpful, gothic-themed Alchemist Baker assistant for the 'Spooky Sweet Bakery' app.
+You discuss recipes, ingredients, substitutions, and baking techniques. 
+You also act as the search assistant for the app's current spellbook (recipe list). 
+
+When the user asks to find, search for, or provide recipes, use the following knowledge of the CURRENT available recipes in the app:
+${JSON.stringify(compactRecipes)}
+
+If the user wants a recipe you don't have in the list, you can provide a full alchemical recipe in your message, nicely formatted in Markdown.
+Keep your tone spooky, mysterious, but very helpful. Use Markdown for formatting.`;
+
+    const contents = [];
+    if (history && Array.isArray(history)) {
+      contents.push(...history);
+    }
+    
+    // Add the new message
+    contents.push({ role: "user", parts: [{ text: message }] });
+
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: contents,
+      config: {
+        systemInstruction: systemPrompt,
+      }
+    });
+
+    const replyText = response.text || "The cauldron bubbles mysteriously, but no answer emerges...";
+    res.json({ reply: replyText });
+  } catch (err: any) {
+    console.error("Gemini Chat error:", err);
+    res.status(500).json({ error: err.message || "Failed to communicate with the spirits." });
+  }
+});
+
 // --- VITE DEV WORKFLOW / PRODUCTION STATIC SERVING ---
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {

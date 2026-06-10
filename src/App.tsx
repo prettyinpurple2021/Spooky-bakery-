@@ -91,6 +91,8 @@ const COVEN_MULTIPLIERS = [
   { value: 13.0, label: "Grand Eclipse (13.0x Portion!)" }
 ];
 
+import { Chatbot } from "./components/Chatbot";
+
 export default function App() {
   // Recipes list and state
   const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -1077,35 +1079,6 @@ export default function App() {
           </svg>
         </div>
       </header>
-
-      {/* DETAILED MULTI-LAYERED SPY-SWEET APP ICING DRIPS */}
-      <div className="no-print w-full relative z-20 pointer-events-none select-none bg-gradient-to-b from-[#171324] to-transparent pb-6 -mt-1 overflow-hidden">
-        {/* Layer 1: Dark Purple / Berry shadow dripping */}
-        <svg className="w-full h-12 text-[#28153c]/90 fill-current drop-shadow-[0_4px_6px_rgba(0,0,0,0.6)]" viewBox="0 0 1440 80" preserveAspectRatio="none">
-          <path d="M0,0 L1440,0 L1440,30 C1400,30 1380,50 1350,50 C1320,50 1300,15 1260,15 C1220,15 1200,60 1160,60 C1120,60 1100,20 1060,20 C1020,20 1000,45 960,45 C920,45 900,10 860,10 C820,10 800,55 760,55 C720,55 700,25 660,25 C620,25 600,40 560,40 C520,40 500,15 460,15 C420,15 400,50 360,50 C320,50 300,20 260,20 C220,20 200,65 160,65 C120,65 100,25 60,25 C20,25 0,45 0,45 Z" />
-        </svg>
-
-        {/* Layer 2: Mysterious Lavender Frosting */}
-        <svg className="w-full h-10 -mt-10 text-[#c397e8] fill-current relative z-10 opacity-90" viewBox="0 0 1440 80" preserveAspectRatio="none">
-          <path d="M0,0 L1440,0 L1440,20 C1410,20 1390,40 1360,40 C1330,40 1310,10 1270,10 C1230,10 1210,48 1170,48 C1130,48 1110,15 1070,15 C1030,15 1010,35 970,35 C930,35 910,5 870,5 C830,5 810,42 770,42 C730,42 710,18 670,18 C630,18 610,32 570,32 C530,32 510,10 470,10 C430,10 410,40 370,40 C330,40 310,15 270,15 C230,15 210,52 170,52 C130,52 110,20 70,20 C30,20 0,35 0,35 Z" />
-        </svg>
-
-        {/* Layer 3: Foreground Creamy Strawberry Pink Icing with glow */}
-        <svg className="w-full h-11 -mt-9 text-[#ffb7c5] fill-current relative z-20 filter drop-shadow-[0_2px_4px_rgba(255,183,197,0.3)]" viewBox="0 0 1440 80" preserveAspectRatio="none">
-          <path d="M0,0 L1440,0 L1440,15 C1420,15 1400,32 1370,32 C1340,32 1320,8 1280,8 C1240,8 1220,40 1180,40 C1140,40 1120,12 1080,12 C1040,12 1020,28 980,28 C940,28 920,3 880,3 C840,3 820,35 780,35 C740,35 720,14 680,14 C640,14 620,25 580,25 C540,25 520,6 480,6 C440,6 420,32 380,32 C340,32 320,10 280,10 C240,10 220,42 180,42 C140,42 120,16 80,16 C40,16 0,28 0,28 Z" />
-        </svg>
-
-        {/* Hanging animated frosting droplets centered horizontally */}
-        <div className="absolute left-0 right-0 bottom-[2px] flex justify-around px-12 z-30 opacity-90">
-          <div className="w-3 h-3 rounded-full bg-[#ffb7c5] animate-bounce filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" style={{ transformOrigin: "top center", animationDuration: "2.1s" }} />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#98ffd9] animate-pulse filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]" style={{ animationDuration: "1.4s" }} />
-          <div className="w-3.5 h-3.5 rounded-full bg-[#ffb7c5] animate-bounce filter drop-shadow-[0_2px_3px_rgba(0,0,0,0.55)]" style={{ transformOrigin: "top center", animationDuration: "2.8s" }} />
-          <div className="w-2 h-2 rounded-full bg-[#c397e8] animate-pulse filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" style={{ animationDuration: "1.9s" }} />
-          <div className="w-3 h-3 rounded-full bg-[#ffb7c5] animate-bounce filter drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" style={{ transformOrigin: "top center", animationDuration: "2.5s" }} />
-          <div className="w-2 rounded-full h-3 bg-[#98ffd9] animate-pulse filter drop-shadow-[0_2px_3px_rgba(0,0,0,0.5)]" style={{ animationDuration: "1.2s" }} />
-          <div className="w-2.5 h-2.5 rounded-full bg-[#ffb7c5] animate-bounce filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]" style={{ transformOrigin: "top center", animationDuration: "1.8s" }} />
-        </div>
-      </div>
 
       {/* MAIN CONTAINER */}
       <main className="max-w-6xl mx-auto px-4 mt-12 md:px-8 relative z-10 pb-24">
@@ -2236,6 +2209,7 @@ export default function App() {
         </div>
       </div>
 
+      <Chatbot />
     </div>
   );
 }
