@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { MessageCircle, X, Send, Loader2, Sparkles } from "lucide-react";
+import { MessageCircle, X, Send, Loader2, Sparkles, Volume2, VolumeX } from "lucide-react";
 import Markdown from "react-markdown";
 
 interface Message {
@@ -7,8 +7,10 @@ interface Message {
   text: string;
 }
 
-export function Chatbot() {
+export function Chatbot({ onRecipeSaved, pantry, recipes = [] }: { onRecipeSaved?: (recipe?: any) => void, pantry?: string[], recipes?: any[] }) {
+
   const [isOpen, setIsOpen] = useState(false);
+  const [isVoiceEnabled, setIsVoiceEnabled] = useState(true);
   const [messages, setMessages] = useState<Message[]>([
     { role: "model", text: "Welcome to the Spooky Sweet Bakery. Need help finding a recipe in our spellbook, or wish to conjure a new one entirely? Ask away..." }
   ]);
@@ -21,6 +23,17 @@ export function Chatbot() {
       bottomRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages, isOpen, isTyping]);
+
+  const speakReply = (textToSpeak: string) => {
+    if (isVoiceEnabled && 'speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const cleanText = textToSpeak.replace(/[\#\*\_\[\]\(\)\`\~]/g, '');
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.rate = 0.85;
+      utterance.pitch = 0.7;
+      window.speechSynthesis.speak(utterance);
+    }
+  };
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,8 +48,6 @@ export function Chatbot() {
     setIsTyping(true);
 
     try {
-      // Map history to the format Gemini API expects (skipping our local intro message if we want, or sending it)
-      // Actually, let's just send all of them mapped to Gemini structure: role and parts
       const historyToSend = updatedMessages.slice(0, -1).map(m => ({
         role: m.role,
         parts: [{ text: m.text }]
@@ -45,10 +56,11 @@ export function Chatbot() {
       const res = await fetch("/api/gemini/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        // Skip sending the very first friendly intro if it just adds token noise? No, let's keep it.
         body: JSON.stringify({
           message: userMsg,
-          history: historyToSend
+          history: historyToSend,
+          pantry: pantry || [],
+          recipes: recipes || []
         }),
       });
 
@@ -57,7 +69,13 @@ export function Chatbot() {
       }
 
       const data = await res.json();
-      setMessages(prev => [...prev, { role: "model", text: data.reply || "No spectral reply..." }]);
+      const botResponse = data.reply || "No spectral reply...";
+      setMessages(prev => [...prev, { role: "model", text: botResponse }]);
+      speakReply(botResponse);
+      
+      if (data.toolUsed && onRecipeSaved) {
+        onRecipeSaved(data.recipeToSave);
+      }
     } catch (err: any) {
       setMessages(prev => [...prev, { role: "model", text: "*(A magical interference occurred... Please try casting your message again.)*" }]);
     } finally {
@@ -100,12 +118,25 @@ export function Chatbot() {
                 Spectral Assistant
               </h3>
             </div>
-            <button 
-              onClick={() => setIsOpen(false)}
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              <X className="w-5 h-5" />
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  if (isVoiceEnabled && 'speechSynthesis' in window) window.speechSynthesis.cancel();
+                  setIsVoiceEnabled(!isVoiceEnabled);
+                }}
+                className="text-gray-400 hover:text-[#98ffd9] transition-colors mr-2"
+                title={isVoiceEnabled ? "Mute Bot Voice" : "Enable Bot Voice"}
+              >
+                {isVoiceEnabled ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
+              </button>
+              <button 
+                onClick={() => setIsOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+                title="Close Assistant"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Messages Area */}

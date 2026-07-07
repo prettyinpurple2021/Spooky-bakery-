@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "recipe": {
+      "title": "Recipe",
+      "description": "An alchemical baking recipe",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string" },
+        "prep": { "type": "string" },
+        "cook": { "type": "string" },
+        "yield": { "type": "string" },
+        "category": { "type": "string", "enum": ["Cake", "Dessert", "Breakfast", "Other"] },
+        "ingredients": { "type": "array", "items": { "type": "string" } },
+        "directions": { "type": "array", "items": { "type": "string" } },
+        "favorite": { "type": "boolean" },
+        "ownerId": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["title", "prep", "cook", "yield", "category", "ingredients", "directions", "favorite", "ownerId", "createdAt", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "recipes/{recipeId}": {
+      "schema": "recipe",
+      "description": "Store user recipes"
+    }
+  }
+}

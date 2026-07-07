@@ -2,7 +2,7 @@ import express from "express";
 import path from "path";
 import fs from "fs";
 import { createServer as createViteServer } from "vite";
-import { GoogleGenAI, Type } from "@google/genai";
+import { GoogleGenAI, Type, FunctionDeclaration } from "@google/genai";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -203,14 +203,14 @@ You MUST return a JSON object conforming exactly to this schema:
 
 // POST: Conversational Chatbot
 app.post("/api/gemini/chat", async (req, res) => {
-  const { history, message } = req.body;
+  const { history, message, pantry, recipes } = req.body;
   if (!message) {
     return res.status(400).json({ error: "Message is required." });
   }
 
   try {
     const ai = getGeminiClient();
-    const currentRecipes = readRecipes();
+    const currentRecipes = Array.isArray(recipes) ? recipes : [];
     
     // Create a compact version of recipes for context to save tokens
     const compactRecipes = currentRecipes.map((r, i) => ({
@@ -224,11 +224,42 @@ app.post("/api/gemini/chat", async (req, res) => {
 You discuss recipes, ingredients, substitutions, and baking techniques. 
 You also act as the search assistant for the app's current spellbook (recipe list). 
 
+The user's current pantry contains exactly: ${pantry && pantry.length > 0 ? pantry.join(", ") : "nothing"}.
+Use this pantry info to suggest recipes or substitutions whenever relevant!
+
 When the user asks to find, search for, or provide recipes, use the following knowledge of the CURRENT available recipes in the app:
 ${JSON.stringify(compactRecipes)}
 
 If the user wants a recipe you don't have in the list, you can provide a full alchemical recipe in your message, nicely formatted in Markdown.
+If the user asks to save, store, or remember a recipe you generated, ALWAYS use the 'saveRecipe' tool to add it to their spellbook.
 Keep your tone spooky, mysterious, but very helpful. Use Markdown for formatting.`;
+
+    const saveRecipeDeclaration: FunctionDeclaration = {
+      name: "saveRecipe",
+      description: "Saves a new recipe to the bakery spellbook. Invoke this tool when the user asks to save or add a recipe you've just discussed or conjured.",
+      parameters: {
+        type: Type.OBJECT,
+        properties: {
+          title: { type: Type.STRING },
+          prep: { type: Type.STRING },
+          cook: { type: Type.STRING },
+          yield: { type: Type.STRING },
+          category: {
+            type: Type.STRING,
+            enum: ["Cake", "Dessert", "Breakfast", "Other"]
+          },
+          ingredients: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING }
+          },
+          directions: {
+            type: Type.ARRAY,
+            items: { type: Type.STRING }
+          }
+        },
+        required: ["title", "prep", "cook", "yield", "category", "ingredients", "directions"]
+      }
+    };
 
     const contents = [];
     if (history && Array.isArray(history)) {
@@ -238,19 +269,151 @@ Keep your tone spooky, mysterious, but very helpful. Use Markdown for formatting
     // Add the new message
     contents.push({ role: "user", parts: [{ text: message }] });
 
-    const response = await ai.models.generateContent({
+    let aiResponse = await ai.models.generateContent({
       model: "gemini-3.5-flash",
       contents: contents,
       config: {
         systemInstruction: systemPrompt,
+        tools: [{ functionDeclarations: [saveRecipeDeclaration] }]
       }
     });
 
-    const replyText = response.text || "The cauldron bubbles mysteriously, but no answer emerges...";
-    res.json({ reply: replyText });
+    let replyText = aiResponse.text || "The cauldron bubbles mysteriously...";
+    let toolUsed = false;
+
+    if (aiResponse.functionCalls && aiResponse.functionCalls.length > 0) {
+      for (const call of aiResponse.functionCalls) {
+        if (call.name === "saveRecipe") {
+          const args = call.args as any;
+          const freshRecipe = {
+            title: args.title,
+            prep: args.prep,
+            cook: args.cook,
+            yield: args.yield,
+            category: args.category || "Other",
+            ingredients: args.ingredients || [],
+            directions: args.directions || [],
+            favorite: false
+          };
+          
+          toolUsed = true;
+
+          const modelTurn = aiResponse.candidates?.[0]?.content;
+          if (modelTurn) {
+             contents.push(modelTurn);
+             contents.push({
+               role: "user",
+               parts: [{
+                 functionResponse: {
+                   name: call.name,
+                   response: { result: "Recipe successfully forwarded to the client's spellbook. It will be saved by their client device." }
+                 }
+               }]
+             });
+          }
+
+          // Return immediately with the recipe to save
+          return res.json({ reply: "I have prepared the spell for your spellbook!", toolUsed: true, recipeToSave: freshRecipe });
+        }
+
+      }
+
+      if (toolUsed) {
+        aiResponse = await ai.models.generateContent({
+          model: "gemini-3.5-flash",
+          contents: contents,
+          config: {
+            systemInstruction: systemPrompt,
+            tools: [{ functionDeclarations: [saveRecipeDeclaration] }]
+          }
+        });
+        replyText = aiResponse.text || replyText;
+      }
+    }
+
+    res.json({ reply: replyText, toolUsed });
   } catch (err: any) {
     console.error("Gemini Chat error:", err);
     res.status(500).json({ error: err.message || "Failed to communicate with the spirits." });
+  }
+});
+
+// POST: Generate Image
+app.post("/api/images/generate", async (req, res) => {
+  const { prompt, size, aspectRatio, model } = req.body;
+  if (!prompt) {
+    return res.status(400).json({ error: "Prompt is required." });
+  }
+
+  try {
+    const ai = getGeminiClient();
+    const generationModel = model || "gemini-3.1-flash-image";
+    const interaction = await ai.interactions.create({
+      model: generationModel,
+      input: prompt,
+      response_modalities: ['image'],
+      generation_config: {
+        image_config: {
+          aspect_ratio: aspectRatio || "1:1",
+          image_size: size || "1K"
+        },
+      },
+    });
+
+    let imageUrl = null;
+    if (interaction.steps) {
+      for (const step of interaction.steps) {
+        if (step.type === 'model_output') {
+          const imageContent = step.content?.find(c => c.type === 'image');
+          if (imageContent && imageContent.data) {
+            const base64EncodeString: string = imageContent.data;
+            const mimeType = imageContent.mime_type || 'image/png';
+            imageUrl = `data:${mimeType};base64,${base64EncodeString}`;
+          }
+        }
+      }
+    }
+
+    if (!imageUrl) {
+      throw new Error("No image was successfully generated.");
+    }
+
+    res.json({ imageUrl });
+
+  } catch (err: any) {
+    console.error("Gemini Image Generation error:", err);
+    res.status(500).json({ error: err.message || "Failed to generate image." });
+  }
+});
+
+// POST: Verify reCAPTCHA token
+app.post("/api/verify-recaptcha", async (req, res) => {
+  const { token } = req.body;
+  if (!token) {
+    return res.status(400).json({ error: "Missing token" });
+  }
+
+  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+  if (!secretKey) {
+    console.warn("RECAPTCHA_SECRET_KEY is not configured on the server. Bypassing token validation (dev/preview mode).");
+    return res.json({ success: true, score: 1.0 });
+  }
+
+  try {
+    const response = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${token}`, {
+      method: 'POST'
+    });
+    
+    const data: any = await response.json();
+    if (!data.success) {
+      return res.status(400).json({ error: "reCAPTCHA verification failed", details: data });
+    }
+
+    // Success response with the score
+    res.json({ success: true, score: data.score });
+  } catch (err: any) {
+    console.error("reCAPTCHA verification error:", err);
+    res.status(500).json({ error: "Internal server error during verification" });
   }
 });
 

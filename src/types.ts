@@ -1,13 +1,19 @@
 export interface Recipe {
+  id?: string;
   title: string;
   prep: string;
   cook: string;
   yield: string;
-  category: "Cake" | "Dessert" | "Breakfast" | "Other";
+  category: string;
   favorite: boolean;
   ingredients: string[];
   directions: string[];
+  ownerId?: string;
+  imageUrl?: string;
+  createdAt?: any;
+  updatedAt?: any;
 }
+
 
 export type SelectedEggSubstitute = 
   | "oil_water"
